@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VR Assembly Challenge</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="panel panel--hero" id="menuPanel">
+        <p class="eyebrow">CMPT 461 Project</p>
+        <h1>VR Assembly Challenge</h1>
+        <p class="lead">
+          Build machines inside a virtual workshop. Pick up parts with your gaze,
+          place them onto the blueprint, and beat the clock.
+        </p>
+
+        <div class="button-row">
+          <button id="startButton" class="button button--primary">Start Game</button>
+          <button id="tutorialButton" class="button">Tutorial</button>
+        </div>
+
+        <div class="level-picker">
+          <label for="levelSelect">Choose Level</label>
+          <select id="levelSelect" class="select"></select>
+        </div>
+
+        <label class="toggle" for="musicToggle">
+          <input id="musicToggle" type="checkbox" checked />
+          <span>Background Music</span>
+        </label>
+
+        <div class="stats-grid">
+          <article class="card">
+            <h2>Core Loop</h2>
+            <p>Receive a build, collect parts, assemble correctly, and earn stars.</p>
+          </article>
+          <article class="card">
+            <h2>Controls</h2>
+            <p>Look at a part for 1.2s to pick it up, then look at the matching slot to place it.</p>
+          </article>
+          <article class="card">
+            <h2>Challenge</h2>
+            <p>Wrong placements cost time. Use hints when you get stuck, but they reduce your score.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel panel--side hidden" id="sidePanel">
+        <p class="eyebrow">Workshop HUD</p>
+        <h2 id="levelTitle">Level 1</h2>
+        <p id="levelSubtitle" class="lead lead--compact">Assemble the training rocket.</p>
+
+        <div class="metric-list">
+          <div class="metric">
+            <span>Time</span>
+            <strong id="timeLabel">0.0s</strong>
+          </div>
+          <div class="metric">
+            <span>Score</span>
+            <strong id="scoreLabel">0</strong>
+          </div>
+          <div class="metric">
+            <span>Mistakes</span>
+            <strong id="mistakeLabel">0</strong>
+          </div>
+          <div class="metric">
+            <span>Best</span>
+            <strong id="bestLabel">--</strong>
+          </div>
+        </div>
+
+        <div class="objective-box">
+          <h3>Objective</h3>
+          <p id="objectiveText">Build the workshop rocket.</p>
+        </div>
+
+        <div class="button-stack">
+          <button id="hintButton" class="button">Show Hint</button>
+          <button id="restartButton" class="button">Restart Level</button>
+          <button id="nextButton" class="button button--primary hidden">Next Level</button>
+        </div>
+
+        <p id="statusMessage" class="status">Welcome to the workshop.</p>
+      </section>
+    </main>
+
+    <section class="modal hidden" id="tutorialModal" aria-hidden="true">
+      <div class="modal__card">
+        <h2>How To Play</h2>
+        <ol>
+          <li>Look at a loose part until it snaps into your view.</li>
+          <li>Move your gaze to the glowing matching ghost slot.</li>
+          <li>Hold your gaze again to place the part.</li>
+          <li>Finish quickly for a higher score and a better star rating.</li>
+        </ol>
+        <button id="closeTutorialButton" class="button button--primary">Back</button>
+      </div>
+    </section>
+
+    <section class="modal hidden" id="resultsModal" aria-hidden="true">
+      <div class="modal__card">
+        <p class="eyebrow">Level Complete</p>
+        <h2 id="resultTitle">Workshop Rocket Complete</h2>
+        <p id="resultSummary">You finished with style.</p>
+        <div class="stars" id="resultStars" aria-label="Star rating">[ ] [ ] [ ]</div>
+        <button id="resultContinueButton" class="button button--primary">Continue</button>
+      </div>
+    </section>
+
+    <a-scene id="scene" background="color: #d9efe8">
+      <a-entity id="manager" game-manager></a-entity>
+
+      <a-assets>
+        <audio
+          id="pickupSound"
+          src="./assets/sound/freesound_community-pick-up-sfx-38516.mp3"
+          preload="auto"
+        ></audio>
+        <audio
+          id="equipSound"
+          src="./assets/sound/freesound_community-item-equip-6904.mp3"
+          preload="auto"
+        ></audio>
+        <audio
+          id="bgMusic"
+          src="./assets/sound/hitslab-game-gaming-music-295075.mp3"
+          preload="auto"
+          loop
+        ></audio>
+      </a-assets>
+
+      <a-entity id="rig" position="0 1.6 6">
+        <a-entity id="handAnchor" position="0.35 -0.32 -0.9"></a-entity>
+        <a-camera>
+          <a-cursor fuse="true" fuse-timeout="2000" color="#FF5722"></a-cursor>
+        </a-camera>
+      </a-entity>
+
+      <a-entity light="type: ambient; intensity: 0.95"></a-entity>
+      <a-entity light="type: directional; intensity: 0.9" position="2 6 4"></a-entity>
+      <a-entity light="type: point; intensity: 0.5; distance: 20" position="-4 4 2"></a-entity>
+
+      <a-plane position="0 0 0" rotation="-90 0 0" width="26" height="26" color="#b4dba0"></a-plane>
+
+      <a-entity id="worldRoot"></a-entity>
+
+      <a-sky color="#eff8ff"></a-sky>
+    </a-scene>
+
+    <script src="./js/levels.js"></script>
+    <script src="./js/game.js"></script>
+  </body>
+</html>
