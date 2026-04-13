@@ -38,6 +38,41 @@ body {
   gap: 18px;
 }
 
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(244, 96, 54, 0.26), transparent 25%),
+    radial-gradient(circle at 85% 15%, rgba(46, 156, 202, 0.2), transparent 20%),
+    linear-gradient(145deg, rgba(14, 18, 22, 0.88), rgba(22, 34, 32, 0.94));
+}
+
+.splash__card {
+  width: min(540px, 100%);
+  padding: 34px 30px;
+  border-radius: 28px;
+  background: rgba(18, 26, 25, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.splash__meta {
+  margin: 24px 0;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.splash__meta p:last-child {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
 .panel {
   pointer-events: auto;
   background: var(--panel);
@@ -132,6 +167,25 @@ h1 {
   width: 18px;
   height: 18px;
   accent-color: var(--accent);
+}
+
+.setup-box {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.setup-box h2 {
+  margin-bottom: 12px;
+  font-size: 1.04rem;
+}
+
+.setup-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
 .button-stack {

@@ -3,6 +3,7 @@ const HINT_SCORE_PENALTY = 75;
 const MISTAKE_SCORE_PENALTY = 50;
 const LEVELS = window.LEVELS || [];
 const MUSIC_SETTING_KEY = "vr-assembly-music-enabled";
+const MOBILE_VR_SETTING_KEY = "vr-assembly-mobile-vr-enabled";
 const ROOM_BOUNDS = {
   minX: -8.6,
   maxX: 8.6,
@@ -28,15 +29,27 @@ const state = {
   currentHeldPart: null,
 };
 
+const PROJECT_CREDITS = {
+  name: "Student Name",
+  details: "Student ID | CMPT 461 | Spring 2026",
+};
+
 const ui = {
+  splashScreen: document.querySelector("#splashScreen"),
+  enterProjectButton: document.querySelector("#enterProjectButton"),
+  creditName: document.querySelector("#creditName"),
+  creditDetails: document.querySelector("#creditDetails"),
   menuPanel: document.querySelector("#menuPanel"),
   sidePanel: document.querySelector("#sidePanel"),
   tutorialModal: document.querySelector("#tutorialModal"),
   resultsModal: document.querySelector("#resultsModal"),
   startButton: document.querySelector("#startButton"),
   tutorialButton: document.querySelector("#tutorialButton"),
+  mobileVrButton: document.querySelector("#mobileVrButton"),
   levelSelect: document.querySelector("#levelSelect"),
   musicToggle: document.querySelector("#musicToggle"),
+  mobileModeToggle: document.querySelector("#mobileModeToggle"),
+  setupNote: document.querySelector("#setupNote"),
   closeTutorialButton: document.querySelector("#closeTutorialButton"),
   restartButton: document.querySelector("#restartButton"),
   hintButton: document.querySelector("#hintButton"),
@@ -63,10 +76,24 @@ const handAnchor = document.querySelector("#handAnchor");
 const pickupSound = document.querySelector("#pickupSound");
 const equipSound = document.querySelector("#equipSound");
 const bgMusic = document.querySelector("#bgMusic");
+const textureIds = {
+  wall: document.querySelector("#wallTexture"),
+  floor: document.querySelector("#floorTexture"),
+  metal: document.querySelector("#metalTexture"),
+  panel: document.querySelector("#panelTexture"),
+  warning: document.querySelector("#warningTexture"),
+  red: document.querySelector("#partTextureRed"),
+  blue: document.querySelector("#partTextureBlue"),
+  orange: document.querySelector("#partTextureOrange"),
+};
 
 function isMusicEnabled() {
   const stored = localStorage.getItem(MUSIC_SETTING_KEY);
   return stored === null ? true : stored === "true";
+}
+
+function isMobileVrEnabled() {
+  return localStorage.getItem(MOBILE_VR_SETTING_KEY) === "true";
 }
 
 function getCurrentLevel() {
@@ -103,6 +130,104 @@ function setStatus(message) {
   ui.statusMessage.textContent = message;
 }
 
+function createPatternDataUrl(draw) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext("2d");
+  draw(ctx, canvas.width, canvas.height);
+  return canvas.toDataURL("image/png");
+}
+
+function initializeTextures() {
+  textureIds.wall.src = createPatternDataUrl((ctx, width, height) => {
+    ctx.fillStyle = "#aeb8b9";
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "#98a4a6";
+    for (let y = 0; y < height; y += 48) {
+      for (let x = 0; x < width; x += 64) {
+        ctx.fillRect(x, y, 62, 42);
+      }
+    }
+  });
+
+  textureIds.floor.src = createPatternDataUrl((ctx, width, height) => {
+    ctx.fillStyle = "#8bb174";
+    ctx.fillRect(0, 0, width, height);
+    ctx.strokeStyle = "rgba(255,255,255,0.14)";
+    ctx.lineWidth = 3;
+    for (let i = 0; i <= width; i += 32) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, height);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(width, i);
+      ctx.stroke();
+    }
+  });
+
+  textureIds.metal.src = createPatternDataUrl((ctx, width, height) => {
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, "#798b95");
+    gradient.addColorStop(0.5, "#c8d2d6");
+    gradient.addColorStop(1, "#718089");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "rgba(255,255,255,0.16)";
+    for (let i = 0; i < 18; i += 1) {
+      ctx.beginPath();
+      ctx.arc(18 + i * 14, 20 + (i % 2) * 70, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+
+  textureIds.panel.src = createPatternDataUrl((ctx, width, height) => {
+    ctx.fillStyle = "#5a4b3f";
+    ctx.fillRect(0, 0, width, height);
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    ctx.lineWidth = 4;
+    for (let y = 18; y < height; y += 28) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y - 8);
+      ctx.stroke();
+    }
+  });
+
+  textureIds.warning.src = createPatternDataUrl((ctx, width, height) => {
+    ctx.fillStyle = "#1c2d2f";
+    ctx.fillRect(0, 0, width, height);
+    ctx.strokeStyle = "#e9c46a";
+    ctx.lineWidth = 18;
+    for (let x = -height; x < width; x += 44) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + height, height);
+      ctx.stroke();
+    }
+  });
+
+  const paintPart = (element, base, accent) => {
+    element.src = createPatternDataUrl((ctx, width, height) => {
+      ctx.fillStyle = base;
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = accent;
+      for (let i = 0; i < 5; i += 1) {
+        ctx.fillRect(0, 24 + i * 44, width, 16);
+      }
+      ctx.strokeStyle = "rgba(255,255,255,0.24)";
+      ctx.lineWidth = 4;
+      ctx.strokeRect(10, 10, width - 20, height - 20);
+    });
+  };
+
+  paintPart(textureIds.red, "#cc4b5d", "#8f2234");
+  paintPart(textureIds.blue, "#4a6fa5", "#263e66");
+  paintPart(textureIds.orange, "#f08a24", "#b95d0f");
+}
+
 function playSound(audioEl) {
   if (!audioEl) {
     return;
@@ -117,6 +242,12 @@ function playSound(audioEl) {
 function syncMusicToggle() {
   if (ui.musicToggle) {
     ui.musicToggle.checked = isMusicEnabled();
+  }
+}
+
+function syncMobileVrToggle() {
+  if (ui.mobileModeToggle) {
+    ui.mobileModeToggle.checked = isMobileVrEnabled();
   }
 }
 
@@ -151,6 +282,15 @@ function setMusicEnabled(enabled) {
   }
 
   stopBackgroundMusic();
+}
+
+function setMobileVrEnabled(enabled) {
+  localStorage.setItem(MOBILE_VR_SETTING_KEY, String(enabled));
+  syncMobileVrToggle();
+  scene.setAttribute("embedded", enabled ? "false" : "false");
+  ui.setupNote.textContent = enabled
+    ? "Mobile VR mode is on. Open this page on your phone, tap Enter Mobile VR, and place the phone into a cardboard headset."
+    : "For stereoscopic mobile VR, turn on Mobile VR / Cardboard Mode and press Enter Mobile VR on your phone.";
 }
 
 function resetState() {
@@ -235,6 +375,18 @@ function createEntity(definition, extraAttributes = {}) {
   return el;
 }
 
+function getPartTexture(partId) {
+  if (partId.includes("body") || partId.includes("frame") || partId.includes("core")) {
+    return "#partTextureRed";
+  }
+
+  if (partId.includes("wheel") || partId.includes("arm") || partId.includes("mast")) {
+    return "#partTextureBlue";
+  }
+
+  return "#partTextureOrange";
+}
+
 function buildEnvironment(level) {
   scene.setAttribute("background", `color: ${level.environmentColor}`);
 
@@ -243,35 +395,35 @@ function buildEnvironment(level) {
   backWall.setAttribute("width", "20");
   backWall.setAttribute("height", "4");
   backWall.setAttribute("depth", "0.2");
-  backWall.setAttribute("color", "#bcc8c6");
+  backWall.setAttribute("material", "src: #wallTexture; repeat: 5 1; roughness: 0.95");
 
   const leftWall = document.createElement("a-box");
   leftWall.setAttribute("position", "-10 2 0");
   leftWall.setAttribute("width", "0.2");
   leftWall.setAttribute("height", "4");
   leftWall.setAttribute("depth", "20");
-  leftWall.setAttribute("color", "#bcc8c6");
+  leftWall.setAttribute("material", "src: #wallTexture; repeat: 5 2; roughness: 0.95");
 
   const rightWall = document.createElement("a-box");
   rightWall.setAttribute("position", "10 2 0");
   rightWall.setAttribute("width", "0.2");
   rightWall.setAttribute("height", "4");
   rightWall.setAttribute("depth", "20");
-  rightWall.setAttribute("color", "#bcc8c6");
+  rightWall.setAttribute("material", "src: #wallTexture; repeat: 5 2; roughness: 0.95");
 
   const frontWall = document.createElement("a-box");
   frontWall.setAttribute("position", "0 2 10");
   frontWall.setAttribute("width", "20");
   frontWall.setAttribute("height", "4");
   frontWall.setAttribute("depth", "0.2");
-  frontWall.setAttribute("color", "#bcc8c6");
+  frontWall.setAttribute("material", "src: #wallTexture; repeat: 5 1; roughness: 0.95");
 
   const tray = document.createElement("a-box");
   tray.setAttribute("position", "-4 0.8 0");
   tray.setAttribute("width", "2.8");
   tray.setAttribute("height", "1");
   tray.setAttribute("depth", "2.4");
-  tray.setAttribute("color", "#87664f");
+  tray.setAttribute("material", "src: #panelTexture; repeat: 2 2; roughness: 0.9");
 
   const trayLabel = document.createElement("a-text");
   trayLabel.setAttribute("value", level.partTrayLabel);
@@ -284,7 +436,7 @@ function buildEnvironment(level) {
   platform.setAttribute("width", "4.8");
   platform.setAttribute("height", "0.3");
   platform.setAttribute("depth", "3.2");
-  platform.setAttribute("color", "#93a5a1");
+  platform.setAttribute("material", "src: #metalTexture; repeat: 2 1; roughness: 0.8");
 
   const platformLabel = document.createElement("a-text");
   platformLabel.setAttribute("value", `${level.name} Blueprint`);
@@ -297,15 +449,14 @@ function buildEnvironment(level) {
   ghostBase.setAttribute("width", "2.6");
   ghostBase.setAttribute("height", "0.08");
   ghostBase.setAttribute("depth", "1.7");
-  ghostBase.setAttribute("color", "#8ecae6");
-  ghostBase.setAttribute("opacity", "0.32");
+  ghostBase.setAttribute("material", "src: #warningTexture; opacity: 0.35; transparent: true");
 
   const menuButton = document.createElement("a-box");
   menuButton.setAttribute("position", "-7.8 2.55 6.6");
   menuButton.setAttribute("width", "1.9");
   menuButton.setAttribute("height", "0.7");
   menuButton.setAttribute("depth", "0.2");
-  menuButton.setAttribute("color", "#264653");
+  menuButton.setAttribute("material", "src: #warningTexture; roughness: 0.9");
   menuButton.setAttribute("rotation", "0 90 0");
   menuButton.setAttribute("gaze-action", "action: menu; label: Return to Menu");
 
@@ -322,7 +473,7 @@ function buildEnvironment(level) {
   menuFrame.setAttribute("width", "2.2");
   menuFrame.setAttribute("height", "1");
   menuFrame.setAttribute("depth", "0.08");
-  menuFrame.setAttribute("color", "#1f2d2f");
+  menuFrame.setAttribute("material", "src: #metalTexture; roughness: 0.8");
   menuFrame.setAttribute("rotation", "0 90 0");
 
   worldRoot.append(
@@ -347,7 +498,7 @@ function buildLevel(level) {
 
   level.parts.forEach((part) => {
     const partEl = createEntity(part, {
-      material: `color: ${part.color}`,
+      material: `src: ${getPartTexture(part.id)}; color: ${part.color}; roughness: 0.72`,
       "gaze-part": `partId: ${part.id}; label: ${part.label}`,
     });
     worldRoot.appendChild(partEl);
@@ -359,7 +510,7 @@ function buildLevel(level) {
 
     const zoneEl = createEntity(target, {
       opacity: "0.34",
-      material: "transparent: true; opacity: 0.34; color: #5dade2",
+      material: "transparent: true; opacity: 0.34; src: #warningTexture; color: #7fc8f8",
       "drop-zone": `accept: ${part.id}; label: ${part.label}`,
     });
     worldRoot.appendChild(zoneEl);
@@ -588,6 +739,34 @@ AFRAME.registerComponent("game-manager", {
   },
 });
 
+AFRAME.registerComponent("head-tilt-move", {
+  init() {
+    this.direction = new AFRAME.THREE.Vector3();
+  },
+  tick(_time, delta) {
+    if (ui.menuPanel.classList.contains("hidden") === false || state.completed) {
+      return;
+    }
+
+    const lookControls = camera.components["look-controls"];
+    if (!lookControls) {
+      return;
+    }
+
+    const pitch = AFRAME.THREE.MathUtils.radToDeg(lookControls.pitchObject.rotation.x);
+    if (pitch > -22) {
+      return;
+    }
+
+    const step = delta / 1000;
+    camera.object3D.getWorldDirection(this.direction);
+    this.direction.y = 0;
+    this.direction.normalize();
+    rig.object3D.position.x += this.direction.x * 1.6 * step;
+    rig.object3D.position.z += this.direction.z * 1.6 * step;
+  },
+});
+
 AFRAME.registerComponent("gaze-part", {
   schema: {
     partId: { type: "string" },
@@ -714,12 +893,26 @@ function populateLevelSelect() {
 }
 
 function bindUi() {
+  ui.enterProjectButton.addEventListener("click", () => {
+    ui.splashScreen.classList.add("hidden");
+    ui.menuPanel.classList.remove("hidden");
+    playBackgroundMusic();
+  });
+
   ui.startButton.addEventListener("click", () => {
     state.levelIndex = Number(ui.levelSelect?.value ?? 0);
     startLevel();
   });
 
   ui.tutorialButton.addEventListener("click", openTutorial);
+  ui.mobileVrButton.addEventListener("click", () => {
+    if (ui.mobileModeToggle.checked) {
+      scene.enterVR();
+      return;
+    }
+
+    setStatus("Turn on Mobile VR / Cardboard Mode in setup first, then use Enter Mobile VR on your phone.");
+  });
   ui.closeTutorialButton.addEventListener("click", closeTutorial);
   ui.restartButton.addEventListener("click", startLevel);
   ui.hintButton.addEventListener("click", showHint);
@@ -728,13 +921,21 @@ function bindUi() {
   ui.musicToggle.addEventListener("change", (event) => {
     setMusicEnabled(event.target.checked);
   });
+  ui.mobileModeToggle.addEventListener("change", (event) => {
+    setMobileVrEnabled(event.target.checked);
+  });
   ui.levelSelect.addEventListener("change", (event) => {
     state.levelIndex = Number(event.target.value);
     updateHud();
   });
 }
 
+initializeTextures();
+ui.creditName.textContent = PROJECT_CREDITS.name;
+ui.creditDetails.textContent = PROJECT_CREDITS.details;
 populateLevelSelect();
 syncMusicToggle();
+syncMobileVrToggle();
+setMobileVrEnabled(isMobileVrEnabled());
 bindUi();
 updateHud();

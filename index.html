@@ -8,42 +8,84 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
+    <section class="splash" id="splashScreen">
+      <div class="splash__card">
+        <p class="eyebrow">CMPT 461 Immersive Computing</p>
+        <h1>VR Assembly Challenge</h1>
+        <p class="lead">Individual A-Frame Project</p>
+        <div class="splash__meta">
+          <p><strong id="creditName">Niranjan Chhawdi</strong></p>
+          <p id="creditDetails">
+            Student ID: 650404 | CMPT 461 Spring 2026 | Mobile VR Game
+          </p>
+        </div>
+        <button id="enterProjectButton" class="button button--primary">
+          Enter Project
+        </button>
+      </div>
+    </section>
+
     <main class="shell">
-      <section class="panel panel--hero" id="menuPanel">
+      <section class="panel panel--hero hidden" id="menuPanel">
         <p class="eyebrow">CMPT 461 Project</p>
         <h1>VR Assembly Challenge</h1>
         <p class="lead">
-          Build machines inside a virtual workshop. Pick up parts with your gaze,
-          place them onto the blueprint, and beat the clock.
+          Build machines inside a virtual workshop. Pick up parts with your
+          gaze, place them onto the blueprint, and beat the clock.
         </p>
 
         <div class="button-row">
-          <button id="startButton" class="button button--primary">Start Game</button>
+          <button id="startButton" class="button button--primary">
+            Start Game
+          </button>
           <button id="tutorialButton" class="button">Tutorial</button>
+          <button id="mobileVrButton" class="button">Enter Mobile VR</button>
         </div>
 
-        <div class="level-picker">
-          <label for="levelSelect">Choose Level</label>
-          <select id="levelSelect" class="select"></select>
-        </div>
+        <div class="setup-box">
+          <h2>Setup Options</h2>
+          <div class="level-picker">
+            <label for="levelSelect">Choose Level</label>
+            <select id="levelSelect" class="select"></select>
+          </div>
 
-        <label class="toggle" for="musicToggle">
-          <input id="musicToggle" type="checkbox" checked />
-          <span>Background Music</span>
-        </label>
+          <label class="toggle" for="musicToggle">
+            <input id="musicToggle" type="checkbox" checked />
+            <span>Background Music</span>
+          </label>
+
+          <label class="toggle" for="mobileModeToggle">
+            <input id="mobileModeToggle" type="checkbox" />
+            <span>Mobile VR / Cardboard Mode</span>
+          </label>
+
+          <p class="setup-note" id="setupNote">
+            For stereoscopic mobile VR, turn on Mobile VR / Cardboard Mode and
+            press Enter Mobile VR on your phone.
+          </p>
+        </div>
 
         <div class="stats-grid">
           <article class="card">
             <h2>Core Loop</h2>
-            <p>Receive a build, collect parts, assemble correctly, and earn stars.</p>
+            <p>
+              Receive a build, collect parts, assemble correctly, and earn
+              stars.
+            </p>
           </article>
           <article class="card">
             <h2>Controls</h2>
-            <p>Look at a part for 1.2s to pick it up, then look at the matching slot to place it.</p>
+            <p>
+              Look at a part for 1.2s to pick it up, then look at the matching
+              slot to place it.
+            </p>
           </article>
           <article class="card">
             <h2>Challenge</h2>
-            <p>Wrong placements cost time. Use hints when you get stuck, but they reduce your score.</p>
+            <p>
+              Wrong placements cost time. Use hints when you get stuck, but they
+              reduce your score.
+            </p>
           </article>
         </div>
       </section>
@@ -51,7 +93,9 @@
       <section class="panel panel--side hidden" id="sidePanel">
         <p class="eyebrow">Workshop HUD</p>
         <h2 id="levelTitle">Level 1</h2>
-        <p id="levelSubtitle" class="lead lead--compact">Assemble the training rocket.</p>
+        <p id="levelSubtitle" class="lead lead--compact">
+          Assemble the training rocket.
+        </p>
 
         <div class="metric-list">
           <div class="metric">
@@ -80,7 +124,9 @@
         <div class="button-stack">
           <button id="hintButton" class="button">Show Hint</button>
           <button id="restartButton" class="button">Restart Level</button>
-          <button id="nextButton" class="button button--primary hidden">Next Level</button>
+          <button id="nextButton" class="button button--primary hidden">
+            Next Level
+          </button>
         </div>
 
         <p id="statusMessage" class="status">Welcome to the workshop.</p>
@@ -96,7 +142,9 @@
           <li>Hold your gaze again to place the part.</li>
           <li>Finish quickly for a higher score and a better star rating.</li>
         </ol>
-        <button id="closeTutorialButton" class="button button--primary">Back</button>
+        <button id="closeTutorialButton" class="button button--primary">
+          Back
+        </button>
       </div>
     </section>
 
@@ -105,12 +153,22 @@
         <p class="eyebrow">Level Complete</p>
         <h2 id="resultTitle">Workshop Rocket Complete</h2>
         <p id="resultSummary">You finished with style.</p>
-        <div class="stars" id="resultStars" aria-label="Star rating">[ ] [ ] [ ]</div>
-        <button id="resultContinueButton" class="button button--primary">Continue</button>
+        <div class="stars" id="resultStars" aria-label="Star rating">
+          [ ] [ ] [ ]
+        </div>
+        <button id="resultContinueButton" class="button button--primary">
+          Continue
+        </button>
       </div>
     </section>
 
-    <a-scene id="scene" background="color: #d9efe8">
+    <a-scene
+      id="scene"
+      background="color: #d9efe8"
+      vr-mode-ui="enabled: true"
+      device-orientation-permission-ui="enabled: true"
+      xr-mode-ui="XRMode: xr"
+    >
       <a-entity id="manager" game-manager></a-entity>
 
       <a-assets>
@@ -130,9 +188,17 @@
           preload="auto"
           loop
         ></audio>
+        <img id="wallTexture" alt="" />
+        <img id="floorTexture" alt="" />
+        <img id="metalTexture" alt="" />
+        <img id="panelTexture" alt="" />
+        <img id="warningTexture" alt="" />
+        <img id="partTextureRed" alt="" />
+        <img id="partTextureBlue" alt="" />
+        <img id="partTextureOrange" alt="" />
       </a-assets>
 
-      <a-entity id="rig" position="0 1.6 6">
+      <a-entity id="rig" position="0 1.6 6" head-tilt-move>
         <a-entity id="handAnchor" position="0.35 -0.32 -0.9"></a-entity>
         <a-camera>
           <a-cursor fuse="true" fuse-timeout="2000" color="#FF5722"></a-cursor>
@@ -140,10 +206,22 @@
       </a-entity>
 
       <a-entity light="type: ambient; intensity: 0.95"></a-entity>
-      <a-entity light="type: directional; intensity: 0.9" position="2 6 4"></a-entity>
-      <a-entity light="type: point; intensity: 0.5; distance: 20" position="-4 4 2"></a-entity>
+      <a-entity
+        light="type: directional; intensity: 0.9"
+        position="2 6 4"
+      ></a-entity>
+      <a-entity
+        light="type: point; intensity: 0.5; distance: 20"
+        position="-4 4 2"
+      ></a-entity>
 
-      <a-plane position="0 0 0" rotation="-90 0 0" width="26" height="26" color="#b4dba0"></a-plane>
+      <a-plane
+        position="0 0 0"
+        rotation="-90 0 0"
+        width="26"
+        height="26"
+        material="src: #floorTexture; repeat: 8 8; roughness: 1"
+      ></a-plane>
 
       <a-entity id="worldRoot"></a-entity>
 
