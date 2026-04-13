@@ -324,7 +324,7 @@ async function requestFullscreenIfPossible() {
   }
 }
 
-async function enterMobileVrMode() {
+function enterMobileVrMode() {
   if (!ui.mobileModeToggle.checked) {
     ui.mobileModeToggle.checked = true;
     setMobileVrEnabled(true);
@@ -332,13 +332,12 @@ async function enterMobileVrMode() {
 
   state.levelIndex = Number(ui.levelSelect?.value ?? 0);
   startLevel();
-  await requestFullscreenIfPossible();
 
-  window.setTimeout(() => {
-    scene.enterVR().catch(() => {
-      setStatus("VR did not start automatically. Try tapping Enter Mobile VR again or use a WebXR-compatible browser on your phone.");
-    });
-  }, 250);
+  scene.enterVR().catch(() => {
+    setStatus(
+      "Stereoscopic VR did not open from this tap. Try tapping Enter Mobile VR again after the page finishes loading on your phone.",
+    );
+  });
 }
 
 function resetState() {
