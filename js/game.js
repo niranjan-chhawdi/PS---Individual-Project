@@ -41,6 +41,9 @@ const ui = {
   creditDetails: document.querySelector("#creditDetails"),
   menuPanel: document.querySelector("#menuPanel"),
   sidePanel: document.querySelector("#sidePanel"),
+  mobileHud: document.querySelector("#mobileHud"),
+  mobileHudDrawer: document.querySelector("#mobileHudDrawer"),
+  mobileHudToggle: document.querySelector("#mobileHudToggle"),
   tutorialModal: document.querySelector("#tutorialModal"),
   resultsModal: document.querySelector("#resultsModal"),
   startButton: document.querySelector("#startButton"),
@@ -52,6 +55,8 @@ const ui = {
   setupNote: document.querySelector("#setupNote"),
   closeTutorialButton: document.querySelector("#closeTutorialButton"),
   restartButton: document.querySelector("#restartButton"),
+  mobileHintButton: document.querySelector("#mobileHintButton"),
+  mobileRestartButton: document.querySelector("#mobileRestartButton"),
   hintButton: document.querySelector("#hintButton"),
   nextButton: document.querySelector("#nextButton"),
   resultContinueButton: document.querySelector("#resultContinueButton"),
@@ -59,10 +64,17 @@ const ui = {
   levelSubtitle: document.querySelector("#levelSubtitle"),
   objectiveText: document.querySelector("#objectiveText"),
   timeLabel: document.querySelector("#timeLabel"),
+  mobileTimeLabel: document.querySelector("#mobileTimeLabel"),
   scoreLabel: document.querySelector("#scoreLabel"),
+  mobileScoreLabel: document.querySelector("#mobileScoreLabel"),
   mistakeLabel: document.querySelector("#mistakeLabel"),
+  mobileMistakeLabel: document.querySelector("#mobileMistakeLabel"),
   bestLabel: document.querySelector("#bestLabel"),
   statusMessage: document.querySelector("#statusMessage"),
+  mobileLevelTitle: document.querySelector("#mobileLevelTitle"),
+  mobileLevelSubtitle: document.querySelector("#mobileLevelSubtitle"),
+  mobileObjectiveText: document.querySelector("#mobileObjectiveText"),
+  mobileStatusMessage: document.querySelector("#mobileStatusMessage"),
   resultTitle: document.querySelector("#resultTitle"),
   resultSummary: document.querySelector("#resultSummary"),
   resultStars: document.querySelector("#resultStars"),
@@ -128,6 +140,9 @@ function clampRigToRoom() {
 
 function setStatus(message) {
   ui.statusMessage.textContent = message;
+  if (ui.mobileStatusMessage) {
+    ui.mobileStatusMessage.textContent = message;
+  }
 }
 
 function createPatternDataUrl(draw) {
@@ -524,9 +539,15 @@ function updateHud() {
   ui.levelTitle.textContent = `${state.levelIndex + 1}. ${level.name}`;
   ui.levelSubtitle.textContent = level.subtitle;
   ui.objectiveText.textContent = level.objective;
+  ui.mobileLevelTitle.textContent = `${state.levelIndex + 1}. ${level.name}`;
+  ui.mobileLevelSubtitle.textContent = level.subtitle;
+  ui.mobileObjectiveText.textContent = level.objective;
   ui.timeLabel.textContent = formatTime(state.elapsedSeconds);
+  ui.mobileTimeLabel.textContent = formatTime(state.elapsedSeconds);
   ui.scoreLabel.textContent = String(clampScore(state.score));
+  ui.mobileScoreLabel.textContent = String(clampScore(state.score));
   ui.mistakeLabel.textContent = String(state.mistakes);
+  ui.mobileMistakeLabel.textContent = String(state.mistakes);
 
   const best = localStorage.getItem(level.bestTimeKey);
   ui.bestLabel.textContent = best ? formatTime(Number(best)) : "--";
@@ -552,6 +573,8 @@ function startLevel() {
   playBackgroundMusic();
   ui.menuPanel.classList.add("hidden");
   ui.sidePanel.classList.remove("hidden");
+  ui.mobileHud.classList.remove("hidden");
+  ui.mobileHudDrawer.classList.add("hidden");
   ui.nextButton.classList.add("hidden");
   ui.resultsModal.classList.add("hidden");
   setStatus(`Build the ${level.name}. Start by collecting a part from the tray.`);
@@ -565,6 +588,8 @@ function returnToMenu() {
   document.exitPointerLock?.();
   stopBackgroundMusic();
   ui.sidePanel.classList.add("hidden");
+  ui.mobileHud.classList.add("hidden");
+  ui.mobileHudDrawer.classList.add("hidden");
   ui.resultsModal.classList.add("hidden");
   ui.resultsModal.setAttribute("aria-hidden", "true");
   ui.menuPanel.classList.remove("hidden");
@@ -915,9 +940,14 @@ function bindUi() {
   });
   ui.closeTutorialButton.addEventListener("click", closeTutorial);
   ui.restartButton.addEventListener("click", startLevel);
+  ui.mobileRestartButton.addEventListener("click", startLevel);
   ui.hintButton.addEventListener("click", showHint);
+  ui.mobileHintButton.addEventListener("click", showHint);
   ui.nextButton.addEventListener("click", openResultsOrAdvance);
   ui.resultContinueButton.addEventListener("click", openResultsOrAdvance);
+  ui.mobileHudToggle.addEventListener("click", () => {
+    ui.mobileHudDrawer.classList.toggle("hidden");
+  });
   ui.musicToggle.addEventListener("change", (event) => {
     setMusicEnabled(event.target.checked);
   });

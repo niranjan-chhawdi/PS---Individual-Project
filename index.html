@@ -131,6 +131,39 @@
 
         <p id="statusMessage" class="status">Welcome to the workshop.</p>
       </section>
+
+      <section class="panel panel--mobile hidden" id="mobileHud">
+        <div class="mobile-hud__bar">
+          <div class="mobile-hud__metric">
+            <span>Time</span>
+            <strong id="mobileTimeLabel">0.0s</strong>
+          </div>
+          <div class="mobile-hud__metric">
+            <span>Score</span>
+            <strong id="mobileScoreLabel">0</strong>
+          </div>
+          <div class="mobile-hud__metric">
+            <span>Mistakes</span>
+            <strong id="mobileMistakeLabel">0</strong>
+          </div>
+          <button id="mobileHudToggle" class="button mobile-hud__toggle">Menu</button>
+        </div>
+
+        <div class="mobile-hud__drawer hidden" id="mobileHudDrawer">
+          <p class="eyebrow">Level Info</p>
+          <h2 id="mobileLevelTitle">Level 1</h2>
+          <p id="mobileLevelSubtitle" class="lead lead--compact">Assemble the training rocket.</p>
+          <div class="objective-box">
+            <h3>Objective</h3>
+            <p id="mobileObjectiveText">Build the workshop rocket.</p>
+          </div>
+          <div class="button-stack">
+            <button id="mobileHintButton" class="button">Show Hint</button>
+            <button id="mobileRestartButton" class="button">Restart Level</button>
+          </div>
+          <p id="mobileStatusMessage" class="status">Welcome to the workshop.</p>
+        </div>
+      </section>
     </main>
 
     <section class="modal hidden" id="tutorialModal" aria-hidden="true">

@@ -92,6 +92,12 @@ body {
   padding: 22px;
 }
 
+.panel--mobile {
+  display: none;
+  width: 100%;
+  padding: 10px;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   letter-spacing: 0.16em;
@@ -317,6 +323,44 @@ h1 {
   display: none;
 }
 
+.mobile-hud__bar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.mobile-hud__metric {
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  min-width: 0;
+}
+
+.mobile-hud__metric span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.mobile-hud__metric strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.96rem;
+}
+
+.mobile-hud__toggle {
+  padding: 10px 14px;
+}
+
+.mobile-hud__drawer {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(18, 26, 25, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 a-scene {
   width: 100vw;
   height: 100vh;
@@ -324,9 +368,9 @@ a-scene {
 
 @media (max-width: 900px) {
   .shell {
-    flex-direction: column;
-    align-items: stretch;
     padding: 14px;
+    align-items: stretch;
+    justify-content: flex-start;
   }
 
   .panel--hero,
@@ -336,5 +380,23 @@ a-scene {
 
   .panel--hero {
     max-width: none;
+  }
+
+  .panel--side {
+    display: none;
+  }
+
+  .panel--mobile {
+    display: block;
+    align-self: flex-start;
+    pointer-events: auto;
+  }
+
+  .lead {
+    max-width: none;
+  }
+
+  .status {
+    min-height: 0;
   }
 }
