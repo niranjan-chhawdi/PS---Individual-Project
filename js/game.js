@@ -46,7 +46,6 @@ const ui = {
   mobileHudToggle: document.querySelector("#mobileHudToggle"),
   tutorialModal: document.querySelector("#tutorialModal"),
   resultsModal: document.querySelector("#resultsModal"),
-  mobileVrModal: document.querySelector("#mobileVrModal"),
   startButton: document.querySelector("#startButton"),
   tutorialButton: document.querySelector("#tutorialButton"),
   mobileVrButton: document.querySelector("#mobileVrButton"),
@@ -55,7 +54,6 @@ const ui = {
   mobileModeToggle: document.querySelector("#mobileModeToggle"),
   setupNote: document.querySelector("#setupNote"),
   closeTutorialButton: document.querySelector("#closeTutorialButton"),
-  closeMobileVrModalButton: document.querySelector("#closeMobileVrModalButton"),
   restartButton: document.querySelector("#restartButton"),
   mobileHintButton: document.querySelector("#mobileHintButton"),
   mobileRestartButton: document.querySelector("#mobileRestartButton"),
@@ -77,7 +75,6 @@ const ui = {
   mobileLevelSubtitle: document.querySelector("#mobileLevelSubtitle"),
   mobileObjectiveText: document.querySelector("#mobileObjectiveText"),
   mobileStatusMessage: document.querySelector("#mobileStatusMessage"),
-  mobileVrMessage: document.querySelector("#mobileVrMessage"),
   resultTitle: document.querySelector("#resultTitle"),
   resultSummary: document.querySelector("#resultSummary"),
   resultStars: document.querySelector("#resultStars"),
@@ -327,11 +324,6 @@ async function requestFullscreenIfPossible() {
   }
 }
 
-function closeMobileVrModal() {
-  ui.mobileVrModal.classList.add("hidden");
-  ui.mobileVrModal.setAttribute("aria-hidden", "true");
-}
-
 async function enterMobileVrMode() {
   if (!ui.mobileModeToggle.checked) {
     ui.mobileModeToggle.checked = true;
@@ -342,38 +334,11 @@ async function enterMobileVrMode() {
   startLevel();
   await requestFullscreenIfPossible();
 
-  const xr = navigator.xr;
-  const supportsImmersiveVr =
-    xr && typeof xr.isSessionSupported === "function"
-      ? await xr.isSessionSupported("immersive-vr").catch(() => false)
-      : false;
-
-  let message =
-    "Mobile mode started. If stereoscopic VR is not supported on this phone/browser, you can still play in fullscreen mobile mode with gaze controls.";
-
-  if (!supportsImmersiveVr) {
-    message =
-      "This phone or browser does not report WebXR immersive VR support, so true stereoscopic split-screen VR is not available here. The game has started in fullscreen mobile mode instead.";
-    ui.mobileVrMessage.textContent = message;
-    ui.mobileVrModal.classList.remove("hidden");
-    ui.mobileVrModal.setAttribute("aria-hidden", "false");
-    setStatus(message);
-    return;
-  }
-
-  try {
-    await scene.enterVR();
-    message =
-      "Stereoscopic VR was requested. If your phone shows split-screen/Cardboard view, place it into your headset and use gaze controls to play.";
-  } catch {
-    message =
-      "This browser supports WebXR in theory, but it did not enter stereoscopic VR from this page. The game has still started in fullscreen mobile mode.";
-  }
-
-  ui.mobileVrMessage.textContent = message;
-  ui.mobileVrModal.classList.remove("hidden");
-  ui.mobileVrModal.setAttribute("aria-hidden", "false");
-  setStatus(message);
+  window.setTimeout(() => {
+    scene.enterVR().catch(() => {
+      setStatus("VR did not start automatically. Try tapping Enter Mobile VR again or use a WebXR-compatible browser on your phone.");
+    });
+  }, 250);
 }
 
 function resetState() {
@@ -1000,7 +965,6 @@ function bindUi() {
   ui.tutorialButton.addEventListener("click", openTutorial);
   ui.mobileVrButton.addEventListener("click", enterMobileVrMode);
   ui.closeTutorialButton.addEventListener("click", closeTutorial);
-  ui.closeMobileVrModalButton.addEventListener("click", closeMobileVrModal);
   ui.restartButton.addEventListener("click", startLevel);
   ui.mobileRestartButton.addEventListener("click", startLevel);
   ui.hintButton.addEventListener("click", showHint);
