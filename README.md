@@ -1,10 +1,15 @@
 # VR Assembly Challenge Manual
 
+## Game Link
+
+Game Link![https://niranjan-chhawdi.github.io/PS---Individual-Project/]!
+
 ## Overview
 
 `VR Assembly Challenge` is a browser-based A-Frame project built from your original `Assembler.html` class activity.
 
 The current version includes:
+
 - a main menu
 - level selection
 - a tutorial panel
@@ -47,6 +52,7 @@ Main files in the project:
 You can try opening `index.html` directly in a browser.
 
 Steps:
+
 1. Go to the project folder.
 2. Double-click `index.html`.
 3. If the browser allows it, the game will load.
@@ -70,6 +76,7 @@ http://localhost:8000
 ```
 
 If you use VS Code:
+
 - Install the `Live Server` extension.
 - Right-click `index.html`.
 - Choose `Open with Live Server`.
@@ -81,6 +88,7 @@ If you use VS Code:
 The project currently uses the same basic camera control style as your original `Assembler.html`.
 
 Controls:
+
 - Move your view with the mouse or device look controls.
 - Use the center gaze cursor.
 - Look at a part for the fuse duration to pick it up.
@@ -95,6 +103,7 @@ Controls:
 ### Main Menu
 
 The menu lets the player:
+
 - start the game
 - choose a level
 - open the tutorial
@@ -103,6 +112,7 @@ The menu lets the player:
 ### Gameplay
 
 During a level:
+
 - the player looks at parts to pick them up
 - the player looks at the correct target zone to place them
 - correct placement increases progress and score
@@ -112,6 +122,7 @@ During a level:
 ### Level Completion
 
 When all required parts are placed:
+
 - the level ends
 - a result panel appears
 - score and time are shown
@@ -128,6 +139,7 @@ Edit:
 `js/levels.js`
 
 Each level contains:
+
 - `id`
 - `name`
 - `subtitle`
@@ -139,6 +151,7 @@ Each level contains:
 - `parts`
 
 Each part contains:
+
 - `id`
 - `label`
 - `primitive`
@@ -164,6 +177,7 @@ Main logic is in:
 `js/game.js`
 
 Important sections:
+
 - game state
 - menu and HUD updates
 - sound playback
@@ -178,6 +192,7 @@ Important sections:
 ### Step 1: Create a GitHub repository
 
 On GitHub:
+
 1. Sign in.
 2. Click `New repository`.
 3. Name it something like `vr-assembly-challenge`.
@@ -205,6 +220,7 @@ with your GitHub username.
 ### Step 3: Enable GitHub Pages
 
 On GitHub:
+
 1. Open your repository.
 2. Go to `Settings`.
 3. Open `Pages`.
@@ -259,11 +275,13 @@ vr-assembly-challenge/
 ### Sounds do not play
 
 Possible reasons:
+
 - browser autoplay rules
 - music toggle is off
 - sound file path is wrong
 
 Check:
+
 - `assets/sound/`
 - browser console
 - menu music toggle
@@ -271,6 +289,7 @@ Check:
 ### Game does not load on GitHub Pages
 
 Check:
+
 - `index.html` is in the repository root
 - GitHub Pages is enabled on the correct branch
 - file names match exactly, including capitalization
@@ -278,6 +297,7 @@ Check:
 ### Gaze actions do not trigger
 
 Check:
+
 - the cursor is visible
 - the player keeps the target centered long enough
 - the fuse timeout has not been changed unexpectedly
@@ -287,6 +307,7 @@ Check:
 ## Suggested Next Improvements
 
 Good next upgrades:
+
 - add a proper README for the GitHub repo
 - add screenshots and a gameplay GIF
 - improve the hint visuals
