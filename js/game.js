@@ -46,6 +46,7 @@ const ui = {
   mobileHudToggle: document.querySelector("#mobileHudToggle"),
   tutorialModal: document.querySelector("#tutorialModal"),
   resultsModal: document.querySelector("#resultsModal"),
+  mobileVrModal: document.querySelector("#mobileVrModal"),
   startButton: document.querySelector("#startButton"),
   tutorialButton: document.querySelector("#tutorialButton"),
   mobileVrButton: document.querySelector("#mobileVrButton"),
@@ -54,6 +55,7 @@ const ui = {
   mobileModeToggle: document.querySelector("#mobileModeToggle"),
   setupNote: document.querySelector("#setupNote"),
   closeTutorialButton: document.querySelector("#closeTutorialButton"),
+  closeMobileVrModalButton: document.querySelector("#closeMobileVrModalButton"),
   restartButton: document.querySelector("#restartButton"),
   mobileHintButton: document.querySelector("#mobileHintButton"),
   mobileRestartButton: document.querySelector("#mobileRestartButton"),
@@ -75,6 +77,7 @@ const ui = {
   mobileLevelSubtitle: document.querySelector("#mobileLevelSubtitle"),
   mobileObjectiveText: document.querySelector("#mobileObjectiveText"),
   mobileStatusMessage: document.querySelector("#mobileStatusMessage"),
+  mobileVrMessage: document.querySelector("#mobileVrMessage"),
   resultTitle: document.querySelector("#resultTitle"),
   resultSummary: document.querySelector("#resultSummary"),
   resultStars: document.querySelector("#resultStars"),
@@ -302,10 +305,59 @@ function setMusicEnabled(enabled) {
 function setMobileVrEnabled(enabled) {
   localStorage.setItem(MOBILE_VR_SETTING_KEY, String(enabled));
   syncMobileVrToggle();
-  scene.setAttribute("embedded", enabled ? "false" : "false");
   ui.setupNote.textContent = enabled
     ? "Mobile VR mode is on. Open this page on your phone, tap Enter Mobile VR, and place the phone into a cardboard headset."
     : "For stereoscopic mobile VR, turn on Mobile VR / Cardboard Mode and press Enter Mobile VR on your phone.";
+}
+
+function isLikelyMobile() {
+  return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+}
+
+async function requestFullscreenIfPossible() {
+  const root = document.documentElement;
+  if (document.fullscreenElement || !root.requestFullscreen) {
+    return;
+  }
+
+  try {
+    await root.requestFullscreen();
+  } catch {
+    // Fullscreen may be blocked and is optional.
+  }
+}
+
+function closeMobileVrModal() {
+  ui.mobileVrModal.classList.add("hidden");
+  ui.mobileVrModal.setAttribute("aria-hidden", "true");
+}
+
+async function enterMobileVrMode() {
+  if (!ui.mobileModeToggle.checked) {
+    ui.mobileModeToggle.checked = true;
+    setMobileVrEnabled(true);
+  }
+
+  state.levelIndex = Number(ui.levelSelect?.value ?? 0);
+  startLevel();
+  await requestFullscreenIfPossible();
+
+  let message =
+    "Mobile mode started. If VR does not open, you can still play on your phone in fullscreen with gaze controls.";
+
+  try {
+    await scene.enterVR();
+    message =
+      "VR mode was requested. If your phone shows split-screen or Cardboard view, place it into your headset and use gaze controls to play.";
+  } catch {
+    message =
+      "Your browser did not open VR automatically. The game has still started in mobile fullscreen mode, so you can keep playing on your phone with gaze controls.";
+  }
+
+  ui.mobileVrMessage.textContent = message;
+  ui.mobileVrModal.classList.remove("hidden");
+  ui.mobileVrModal.setAttribute("aria-hidden", "false");
+  setStatus(message);
 }
 
 function resetState() {
@@ -930,15 +982,9 @@ function bindUi() {
   });
 
   ui.tutorialButton.addEventListener("click", openTutorial);
-  ui.mobileVrButton.addEventListener("click", () => {
-    if (ui.mobileModeToggle.checked) {
-      scene.enterVR();
-      return;
-    }
-
-    setStatus("Turn on Mobile VR / Cardboard Mode in setup first, then use Enter Mobile VR on your phone.");
-  });
+  ui.mobileVrButton.addEventListener("click", enterMobileVrMode);
   ui.closeTutorialButton.addEventListener("click", closeTutorial);
+  ui.closeMobileVrModalButton.addEventListener("click", closeMobileVrModal);
   ui.restartButton.addEventListener("click", startLevel);
   ui.mobileRestartButton.addEventListener("click", startLevel);
   ui.hintButton.addEventListener("click", showHint);
@@ -967,5 +1013,9 @@ populateLevelSelect();
 syncMusicToggle();
 syncMobileVrToggle();
 setMobileVrEnabled(isMobileVrEnabled());
+if (isLikelyMobile()) {
+  ui.mobileModeToggle.checked = true;
+  setMobileVrEnabled(true);
+}
 bindUi();
 updateHud();
