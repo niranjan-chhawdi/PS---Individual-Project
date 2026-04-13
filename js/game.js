@@ -342,16 +342,32 @@ async function enterMobileVrMode() {
   startLevel();
   await requestFullscreenIfPossible();
 
+  const xr = navigator.xr;
+  const supportsImmersiveVr =
+    xr && typeof xr.isSessionSupported === "function"
+      ? await xr.isSessionSupported("immersive-vr").catch(() => false)
+      : false;
+
   let message =
-    "Mobile mode started. If VR does not open, you can still play on your phone in fullscreen with gaze controls.";
+    "Mobile mode started. If stereoscopic VR is not supported on this phone/browser, you can still play in fullscreen mobile mode with gaze controls.";
+
+  if (!supportsImmersiveVr) {
+    message =
+      "This phone or browser does not report WebXR immersive VR support, so true stereoscopic split-screen VR is not available here. The game has started in fullscreen mobile mode instead.";
+    ui.mobileVrMessage.textContent = message;
+    ui.mobileVrModal.classList.remove("hidden");
+    ui.mobileVrModal.setAttribute("aria-hidden", "false");
+    setStatus(message);
+    return;
+  }
 
   try {
     await scene.enterVR();
     message =
-      "VR mode was requested. If your phone shows split-screen or Cardboard view, place it into your headset and use gaze controls to play.";
+      "Stereoscopic VR was requested. If your phone shows split-screen/Cardboard view, place it into your headset and use gaze controls to play.";
   } catch {
     message =
-      "Your browser did not open VR automatically. The game has still started in mobile fullscreen mode, so you can keep playing on your phone with gaze controls.";
+      "This browser supports WebXR in theory, but it did not enter stereoscopic VR from this page. The game has still started in fullscreen mobile mode.";
   }
 
   ui.mobileVrMessage.textContent = message;

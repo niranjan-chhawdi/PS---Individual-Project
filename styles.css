@@ -98,6 +98,10 @@ body {
   padding: 10px;
 }
 
+.panel--mobile.hidden {
+  display: none;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   letter-spacing: 0.16em;

@@ -211,9 +211,9 @@
     <a-scene
       id="scene"
       background="color: #d9efe8"
-      vr-mode-ui="enabled: true"
+      vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: true"
-      xr-mode-ui="XRMode: xr"
+      webxr="requiredFeatures: local-floor; optionalFeatures: bounded-floor"
     >
       <a-entity id="manager" game-manager></a-entity>
 
